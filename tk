@@ -147,6 +147,9 @@ case $command in
             sleep 2;
         done
         ;;
+    "check"|"chk")
+        check silent ledger -f "$time_journal" bal
+        ;;
     default)
         echo "Wrong command.";
         exit 1;
