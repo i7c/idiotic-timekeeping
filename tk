@@ -26,7 +26,7 @@ acc_login() {
 }
 
 acc_logout() {
-    acc_logout_string "$@" | vipe >> $time_journal
+    acc_logout_string "$@" >> $time_journal
 }
 
 acc_switch_string() {
