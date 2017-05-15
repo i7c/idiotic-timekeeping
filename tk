@@ -1,6 +1,8 @@
 #!/bin/bash
 
 export time_journal='journal.ldg'
+export plot_dir='./plot'
+export plot_data="$plot_dir/data.csv"
 
 acc_login_string(){
     echo "i $(date +'%Y/%m/%d %H:%M:%S') $*"
@@ -42,8 +44,47 @@ show() {
     ledger bal -f $time_journal
 }
 
+fail() {
+    echo "$@";
+    exit 77;
+}
+
+change_pwd() {
+    [[ -s $last_pwd ]] && {
+        fail "Tried to change pwd twice. Need to reset_pwd.";
+    }
+    last_pwd="$(pwd)"
+    export last_pwd
+    check cd "$*"
+}
+
+reset_pwd() {
+    [[ -z $last_pwd ]] && {
+        fail "Tried to reset_pwd twice.";
+    }
+    check cd "$last_pwd"
+    unset last_pwd
+}
+
+export_csv() {
+    ledger -f journal.ldg bal \
+           --no-total \
+           --base \
+           --balance-format='%a,%T\n' \
+           -p "$1"
+}
+
+chart_pie() {
+    export_csv "$1" > $plot_data
+    change_pwd "$plot_dir"
+    gnuplot pie.gp
+    sxiv pie.png
+    reset_pwd
+}
+
 check which vipe
 check which ledger
+check which gnuplot
 if [[ ! $1 ]]; then
     echo "Specify command."
     exit 1;
@@ -71,6 +112,9 @@ case $command in
         git add $time_journal
         check git diff --exit-code
         git commit -m "$(date +'%Y/%m/%d %H:%M:%S') Automatic commit"
+        ;;
+    "pie")
+        chart_pie "$@"
         ;;
     default)
         echo "Wrong command.";
