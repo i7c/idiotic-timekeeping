@@ -1,0 +1,51 @@
+#!/bin/bash
+
+export time_journal='journal.ldg'
+
+acc_login() {
+    echo "i $(date +'%Y/%m/%d %H:%M:%S') $*" | vipe >> $time_journal
+}
+
+acc_logout() {
+    echo "o $(date +'%Y/%m/%d %H:%M:%S') $*" | vipe >> $time_journal
+}
+
+acc_switch() {
+    acc_login && acc_logout | vipe >> $time_journal
+}
+
+silent() {
+    "$@" >& /dev/null
+}
+
+check() {
+    silent "$@" || {
+        echo "checked execution failed: $*";
+        exit 1;
+    }
+}
+
+check which vipe
+check which ledger
+if [[ ! $1 ]]; then
+    echo "Specify command."
+    exit 1;
+fi
+command=$1
+shift
+
+case $command in
+    "login"|"li")
+        acc_login "$*";
+        ;;
+    "logout"|"lo")
+        acc_logout "$*";
+        ;;
+    "show")
+        ledger bal -f $time_journal
+        ;;
+    default)
+        echo "Wrong command.";
+        exit 1;
+esac
+exit 0;
