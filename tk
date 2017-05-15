@@ -83,15 +83,19 @@ reset_pwd() {
 }
 
 export_csv() {
+    period="$1";
+    style="collapse";
+    [[ -n $2 ]] && style="$2";
     ledger -f journal.ldg bal \
            --no-total \
            --base \
            --balance-format='%a,%T\n' \
+           "--$style" \
            -p "$1"
 }
 
 chart_pie() {
-    export_csv "$1" > $plot_data
+    export_csv "$@" > $plot_data
     change_pwd "$plot_dir"
     gnuplot pie.gp
     reset_pwd
