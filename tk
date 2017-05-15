@@ -2,16 +2,29 @@
 
 export time_journal='journal.ldg'
 
+acc_login_string(){
+    echo "i $(date +'%Y/%m/%d %H:%M:%S') $*"
+}
+
+acc_logout_string() {
+    echo "o $(date +'%Y/%m/%d %H:%M:%S') $*"
+}
+
 acc_login() {
-    echo "i $(date +'%Y/%m/%d %H:%M:%S') $*" | vipe >> $time_journal
+    acc_login_string "$@" | vipe >> $time_journal
 }
 
 acc_logout() {
-    echo "o $(date +'%Y/%m/%d %H:%M:%S') $*" | vipe >> $time_journal
+    acc_logout_string "$@" | vipe >> $time_journal
+}
+
+acc_switch_string() {
+    acc_logout_string "$1"
+    acc_login_string "$2"
 }
 
 acc_switch() {
-    acc_login && acc_logout | vipe >> $time_journal
+     acc_switch_string "$@" | vipe >> $time_journal
 }
 
 silent() {
@@ -25,6 +38,10 @@ check() {
     }
 }
 
+show() {
+    ledger bal -f $time_journal
+}
+
 check which vipe
 check which ledger
 if [[ ! $1 ]]; then
@@ -36,13 +53,24 @@ shift
 
 case $command in
     "login"|"li")
-        acc_login "$*";
+        acc_login "$@";
+        show
         ;;
     "logout"|"lo")
-        acc_logout "$*";
+        acc_logout "$@";
+        show
+        ;;
+    "switch"|"sw")
+        acc_switch "$@";
+        show
         ;;
     "show")
-        ledger bal -f $time_journal
+        show
+        ;;
+    "commit")
+        git add $time_journal
+        check git diff --exit-code
+        git commit -m "$(date +'%Y/%m/%d %H:%M:%S') Automatic commit"
         ;;
     default)
         echo "Wrong command.";
