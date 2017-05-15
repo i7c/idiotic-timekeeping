@@ -93,6 +93,8 @@ chart_pie() {
 check which vipe
 check which ledger
 check which gnuplot
+check which sxiv
+
 if [[ ! $1 ]]; then
     echo "Specify command."
     exit 1;
