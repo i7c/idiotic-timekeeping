@@ -78,7 +78,6 @@ chart_pie() {
     export_csv "$1" > $plot_data
     change_pwd "$plot_dir"
     gnuplot pie.gp
-    sxiv pie.png
     reset_pwd
 }
 
@@ -115,6 +114,16 @@ case $command in
         ;;
     "pie")
         chart_pie "$@"
+        change_pwd "$plot_dir"
+        sxiv pie.png
+        reset_pwd
+        ;;
+    "cpie")
+        while true; do
+            chart_pie "$@"
+            echo "updated ..."
+            sleep 2;
+        done
         ;;
     default)
         echo "Wrong command.";
