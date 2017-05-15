@@ -40,6 +40,7 @@ acc_switch() {
 
 silent() {
     "$@" >& /dev/null
+    return $?
 }
 
 check() {
@@ -82,6 +83,42 @@ reset_pwd() {
     unset last_pwd
 }
 
+git_commit() {
+    git add $time_journal
+    check git diff --exit-code
+    git commit -m "$(date +'%Y-%m-%d %H:%M:%S')"
+    check git diff --exit-code
+}
+
+tran_diff() {
+    git diff
+    echo;
+}
+
+tran_start() {
+    silent git diff --exit-code || {
+        tran_diff
+        fail "Failed to append to journal, there are pending changes! Abort or commit them first.";
+    }
+}
+
+tran_check() {
+    silent ledger -f "$time_journal" bal || {
+        tran_diff
+        fail "Transaction check failed. Run abort to abort or fix manually and run commit."
+    }
+}
+
+tran_commit() {
+   tran_check
+   git_commit
+}
+
+tran_abort() {
+    check git checkout -- "$time_journal"
+    echo "Aborted.";
+}
+
 export_csv() {
     period="$1";
     style="collapse";
@@ -115,24 +152,34 @@ shift
 
 case $command in
     "login"|"li")
+        tran_start
         acc_login "$@";
+        tran_commit
         show
         ;;
     "logout"|"lo")
+        tran_start
         acc_logout "$@";
+        tran_commit
         show
         ;;
     "switch"|"sw")
+        tran_start
         acc_switch "$@";
+        tran_commit
         show
+        ;;
+    "abort")
+        tran_abort
+        ;;
+    "commit")
+        tran_commit
+        ;;
+    "tail")
+        tail -n5 "$time_journal";
         ;;
     "show")
         show "$@"
-        ;;
-    "commit")
-        git add $time_journal
-        check git diff --exit-code
-        git commit -m "$(date +'%Y/%m/%d %H:%M:%S') Automatic commit"
         ;;
     "pie")
         chart_pie "$@"
@@ -148,7 +195,8 @@ case $command in
         done
         ;;
     "check"|"chk")
-        check silent ledger -f "$time_journal" bal
+        silent ledger -f "$time_journal" bal || echo "Journal corrupt.";
+        silent git diff --exit-code || echo "Pending changes.";
         ;;
     *)
         echo "Wrong command.";
