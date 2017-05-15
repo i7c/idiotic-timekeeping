@@ -4,6 +4,11 @@ export time_journal='journal.ldg'
 export plot_dir='./plot'
 export plot_data="$plot_dir/data.csv"
 
+[[ ! -f "$time_journal" ]] && {
+    touch "$time_journal";
+    echo "Created new journal.";
+}
+
 acc_login_string(){
     echo "i $(date +'%Y/%m/%d %H:%M:%S') $*"
 }
