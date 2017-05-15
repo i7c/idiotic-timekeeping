@@ -150,8 +150,8 @@ case $command in
     "check"|"chk")
         check silent ledger -f "$time_journal" bal
         ;;
-    default)
+    *)
         echo "Wrong command.";
-        exit 1;
+        exit 3;
 esac
 exit 0;
