@@ -14,7 +14,11 @@ acc_login_string(){
 }
 
 acc_logout_string() {
-    echo "o $(date +'%Y/%m/%d %H:%M:%S') $*"
+    if [[ -s $1 ]]; then
+        echo "o $(date +'%Y/%m/%d %H:%M:%S') $*"
+    else
+        echo "o $(date +'%Y/%m/%d %H:%M:%S')"
+    fi
 }
 
 acc_login() {
@@ -26,8 +30,8 @@ acc_logout() {
 }
 
 acc_switch_string() {
-    acc_logout_string "$1"
-    acc_login_string "$2"
+    acc_logout_string
+    acc_login_string "$*"
 }
 
 acc_switch() {
