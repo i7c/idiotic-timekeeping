@@ -41,7 +41,11 @@ check() {
 }
 
 show() {
-    ledger bal -f $time_journal
+    period="today";
+    [[ -s $1 ]] && {
+        period="$1";
+    }
+    ledger bal -f $time_journal -p "$period";
 }
 
 fail() {
@@ -105,7 +109,7 @@ case $command in
         show
         ;;
     "show")
-        show
+        show "$@"
         ;;
     "commit")
         git add $time_journal
