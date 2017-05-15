@@ -22,7 +22,7 @@ acc_logout_string() {
 }
 
 acc_login() {
-    acc_login_string "$@" | vipe >> $time_journal
+    acc_login_string "$@" >> $time_journal
 }
 
 acc_logout() {
@@ -35,7 +35,7 @@ acc_switch_string() {
 }
 
 acc_switch() {
-     acc_switch_string "$@" | vipe >> $time_journal
+     acc_switch_string "$@" >> $time_journal
 }
 
 silent() {
@@ -138,7 +138,6 @@ chart_pie() {
     reset_pwd
 }
 
-check which vipe
 check which ledger
 check which gnuplot
 check which sxiv
