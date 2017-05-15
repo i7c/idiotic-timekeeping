@@ -21,6 +21,11 @@ acc_logout_string() {
     fi
 }
 
+acc_switch_string() {
+    acc_logout_string
+    acc_login_string "$*"
+}
+
 acc_login() {
     acc_login_string "$@" >> $time_journal
 }
@@ -29,13 +34,20 @@ acc_logout() {
     acc_logout_string "$@" >> $time_journal
 }
 
-acc_switch_string() {
-    acc_logout_string
-    acc_login_string "$*"
-}
-
 acc_switch() {
      acc_switch_string "$@" >> $time_journal
+}
+
+acc_login_interactive() {
+    acc_login_string "$@" | vipe >> $time_journal
+}
+
+acc_logout_interactive() {
+    acc_logout_string "$@" | vipe >> $time_journal
+}
+
+acc_switch_interactive() {
+    acc_switch_string "$@" | vipe >> $time_journal
 }
 
 silent() {
@@ -165,6 +177,24 @@ case $command in
     "switch"|"sw")
         tran_start
         acc_switch "$@";
+        tran_commit
+        show
+        ;;
+    "lii")
+        tran_start
+        acc_login_interactive "$@";
+        tran_commit
+        show
+        ;;
+    "loi")
+        tran_start
+        acc_logout_interactive "$@";
+        tran_commit
+        show
+        ;;
+    "swi")
+        tran_start
+        acc_switch_interactive "$@";
         tran_commit
         show
         ;;
