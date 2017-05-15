@@ -53,8 +53,11 @@ show() {
     period="today";
     [[ -s $1 ]] && {
         period="$1";
+        shift
     }
-    ledger bal -f $time_journal -p "$period";
+    ledger bal -f $time_journal \
+        -p "$period" \
+        "$@";
 }
 
 fail() {
