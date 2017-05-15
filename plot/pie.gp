@@ -7,7 +7,7 @@ set size square                 # square canvas
 set xrange [-1:1.5]
 set yrange [-1.25:1.25]
 set style fill solid 1
-set terminal png
+set terminal png size 2048,1024
 set output "pie.png"
 
 unset border
