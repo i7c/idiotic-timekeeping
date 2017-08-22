@@ -227,6 +227,9 @@ case $command in
         silent ledger -f "$time_journal" bal || echo "Journal corrupt.";
         silent git diff --exit-code || echo "Pending changes.";
         ;;
+    "current"|"cu")
+        tail -n 1 "$time_journal" | awk '/^i.*/ {print $4}'
+        ;;
     *)
         echo "Wrong command.";
         exit 3;
